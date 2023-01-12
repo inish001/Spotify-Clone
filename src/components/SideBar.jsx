@@ -1,11 +1,12 @@
 import React from 'react'
+import styled from 'styled-components';
 
-function SideBar() {
+export default function SideBar() {
   return (
-    <div>
+    <Container>
       SideBar
-    </div>
+    </Container>
   )
 }
-
-export default SideBar
+const Container = styled.div`
+  background-color: black`;
