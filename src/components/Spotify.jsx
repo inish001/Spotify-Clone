@@ -1,15 +1,26 @@
-import React, {useEffect} from "react";
-import Body from "./Body";
+import React, { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
-import SideBar from "./SideBar";
-import styled from "styled-components";
-import { useStateProvider } from "../utils/StateProvider";
-import { reducerCases } from "../utils/Constants";
 import axios from "axios";
+import { useStateProvider } from "../utils/StateProvider";
+import Body from "./Body";
+import { reducerCases } from "../utils/Constants";
+import Sidebar from "./SideBar";
 
 export default function Spotify() {
   const [{ token }, dispatch] = useStateProvider();
+  const [navBackground, setNavBackground] = useState(false);
+  const [headerBackground, setHeaderBackground] = useState(false);
+  const bodyRef = useRef();
+  const bodyScrolled = () => {
+    bodyRef.current.scrollTop >= 30
+      ? setNavBackground(true)
+      : setNavBackground(false);
+    bodyRef.current.scrollTop >= 268
+      ? setHeaderBackground(true)
+      : setHeaderBackground(false);
+  };
   useEffect(() => {
     const getUserInfo = async () => {
       const { data } = await axios.get("https://api.spotify.com/v1/me", {
@@ -27,14 +38,29 @@ export default function Spotify() {
     };
     getUserInfo();
   }, [dispatch, token]);
+  useEffect(() => {
+    const getPlaybackState = async () => {
+      const { data } = await axios.get("https://api.spotify.com/v1/me/player", {
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      });
+      dispatch({
+        type: reducerCases.SET_PLAYER_STATE,
+        playerState: data.is_playing,
+      });
+    };
+    getPlaybackState();
+  }, [dispatch, token]);
   return (
     <Container>
       <div className="spotify__body">
-        <SideBar />
-        <div className="body">
-          <Navbar />
+        <Sidebar />
+        <div className="body" ref={bodyRef} onScroll={bodyScrolled}>
+          <Navbar navBackground={navBackground} />
           <div className="body__contents">
-            <Body/>
+            <Body headerBackground={headerBackground} />
           </div>
         </div>
       </div>
@@ -44,6 +70,7 @@ export default function Spotify() {
     </Container>
   );
 }
+
 const Container = styled.div`
   max-width: 100vw;
   max-height: 100vh;

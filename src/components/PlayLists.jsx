@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
-import { useStateProvider } from "../utils/StateProvider";
 import axios from "axios";
-import { reducerCases } from "../utils/Constants";
+import React, { useEffect } from "react";
 import styled from "styled-components";
+import { reducerCases } from "../utils/Constants";
+import { useStateProvider } from "../utils/StateProvider";
 
-export default function PlayLists() {
+export default function Playlists() {
   const [{ token, playlists }, dispatch] = useStateProvider();
   useEffect(() => {
     const getPlaylistData = async () => {
@@ -25,12 +25,15 @@ export default function PlayLists() {
     };
     getPlaylistData();
   }, [token, dispatch]);
+  const changeCurrentPlaylist = (selectedPlaylistId) => {
+    dispatch({ type: reducerCases.SET_PLAYLIST_ID, selectedPlaylistId });
+  };
   return (
     <Container>
       <ul>
         {playlists.map(({ name, id }) => {
           return (
-            <li key={id}>
+            <li key={id} onClick={() => changeCurrentPlaylist(id)}>
               {name}
             </li>
           );
@@ -39,6 +42,7 @@ export default function PlayLists() {
     </Container>
   );
 }
+
 const Container = styled.div`
   color: #b3b3b3;
   height: 100%;
@@ -67,4 +71,3 @@ const Container = styled.div`
     }
   }
 `;
-
