@@ -17,6 +17,11 @@ const reducer = (state, action) => {
         ...state,
         playlists: action.playlists,
       };
+    case reducerCases.SET_USER:
+      return {
+        ...state,
+        userInfo: action.userInfo,
+      };
     default:
       return state;
   }
